@@ -1,6 +1,7 @@
 import logo from "./logo.svg";
 import "./App.css";
 import UserList from "../containers/user-list";
+import UserDetails from "../containers/user-details";
 
 function App() {
   return (
@@ -9,6 +10,8 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
       </header>
       <UserList />
+      <br />
+      <UserDetails />
     </div>
   );
 }
