@@ -1,11 +1,13 @@
-const activeUser = (state = null, action) => {
-    switch (action.type) {
-        case "USER_SELECTED":
-            console.log("Yooo", action);
-            return action.payload;
-            break;
-    }
-    return state;
-}
+const defaultUser = JSON.parse(localStorage.getItem("selectedUser"));
+
+const activeUser = (state = defaultUser ?? null, action) => {
+  switch (action.type) {
+    case "USER_SELECTED":
+      localStorage.setItem("selectedUser", JSON.stringify(action.payload));
+      return action.payload;
+    default:
+      return state;
+  }
+};
 
 export default activeUser;
