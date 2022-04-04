@@ -1,70 +1,48 @@
-# Getting Started with Create React App
+# Redux practise
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Redux is used to share state (data) easily between components. When state is changed, the component that uses that state is rerendered. These are my notes below. 
 
-## Available Scripts
+A. Provider is wrapped around the whole app so the app can have access to Store. 
+	const logger = createLogger();
+	const store = createStore(
+	    allReducers,
+	    applyMiddleware(thunk, promise, logger)
+	);
 
-In the project directory, you can run:
+	ReactDOM.render(
+	    <Provider store={store}>
+	        <App />
+	    </Provider>,
+	    document.getElementById('root')
+	);
 
-### `npm start`
+B. Action creaters return Action. Action is composed of a type, which is what the action is, and a payload, which is some data. Actions invoke the reducer to do something with the data.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+C. Reducers are invoked by Actions, and they update the State depending on the action.type. They return the updated state. Since there will be many reducers, we combone them.
+	const allReducers = combineReducers({
+	    users: UserReducer,
+	    activeUser: ActiveUserReducer
+	});
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+	export default allReducers
 
-### `npm test`
+D. Components must read from the Store and use Actions:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. mapStateToProps - connects the store to a component's props. 
+	function mapStateToProps(state) {
+	    return {
+	        user: state.activeUser
+	    };
+	}
+	// We can access our state/store's activeUser, which we call as props.user.
 
-### `npm run build`
+2. matchDispatchToProps - connects our action creators (which dispatch actions) to a component's props.
+	function matchDispatchToProps(dispatch){
+	    return bindActionCreators({selectUser: selectUser}, dispatch);
+	}
+	// We can use props.selectUser() action.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. We must connect our store and actions to our component (UserList) when we it. 
+	export default connect(mapStateToProps, (optional) matchDispatchToProps)(UserList);
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+E. When actions are invoked through a component (e.g. props.selectUser()), it causes the Reducer to be invoked. All reducers are invoked, and it tries to match the action.type. When a matched reducer updates the State, it updates the component.  
